@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
     push:
         branches:
-            - main
+            - master
             - dev
 
 env:
@@ -47,7 +47,7 @@ jobs:
               run: |
                 if [ "${{ github.ref_name }}" == "dev" ]; then
                     echo "IMAGE_TAG=dev" >> $GITHUB_ENV
-                elif [ "${{ github.ref_name }}" == "main" ]; then
+                elif [ "${{ github.ref_name }}" == "master" ]; then
                     echo "IMAGE_TAG=latest" >> $GITHUB_ENV
                 fi
             - name: Docker login
