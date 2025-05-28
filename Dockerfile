@@ -1,28 +1,31 @@
-# Use an official Python runtime as the base image
-FROM python:3.11-slim
+# Use a lightweight Python base image
+FROM python:3.10-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1  # Prevents Python from writing .pyc files
-ENV PYTHONUNBUFFERED=1         # Ensures Python output is sent straight to terminal
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Install system dependencies (if needed, e.g., for psycopg2)
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt .
+# Copy requirements.txt and install Python dependencies
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire project into the container
+COPY ./entrypoint.sh .
+
+# Copy application code to the container
 COPY . .
 
-# Expose the port your app runs on (e.g., 8000 for Django)
+# Expose the application port
 EXPOSE 8000
 
-# Command to run the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "myapi_project.wsgi:application"]
+#Execute Entrypoint when container is made
+RUN ["chmod", "+x", "entrypoint.sh"]
+ENTRYPOINT [ "./entrypoint.sh" ]
